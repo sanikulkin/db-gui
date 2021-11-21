@@ -6,6 +6,8 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow) {
     ui->setupUi(this);
+    ui->splitter->setStretchFactor(0,1);
+    ui->splitter->setStretchFactor(1,0);
 
     connect(ui->requestButton,SIGNAL(clicked()),this,SLOT(SendButton()));
     connect(ui->clearButton,SIGNAL(clicked()),this,SLOT(ClearButton()));
@@ -28,6 +30,7 @@ void MainWindow::on_action_triggered() {
     QSqlDatabase db = ConnectToDb(info);
     setDb(db);
     PrintTables();
+    SaveInfo(info);
 }
 
 void MainWindow::setDb(const QSqlDatabase& p_db) {
@@ -103,4 +106,15 @@ void MainWindow::PrintHistory(const QString& query) {
 
 void MainWindow::PrintErrors(const QString& error) {
    ui->errorLable->setText(error);
+}
+
+void MainWindow::SaveInfo(const ConnectInfo &info) {
+    QSettings settings;
+    settings.beginWriteArray("logins");
+    settings.setValue("dbName", info.dbName);
+    settings.setValue("host", info.host);
+    settings.setValue("password", info.password);
+    settings.setValue("port", info.port);
+    settings.setValue("userName", info.userName);
+    settings.endArray();
 }

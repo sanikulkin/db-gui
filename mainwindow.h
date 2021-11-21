@@ -13,6 +13,7 @@
 #include <QTableView>
 #include <QDebug>
 #include <QStringListModel>
+#include <QSettings>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -49,6 +50,7 @@ private:
     void PrintTables();
     void PrintHistory(const QString& query);
     void PrintErrors(const QString& error);
+    void SaveInfo(const ConnectInfo &info);
 };
 
 #endif // MAINWINDOW_H

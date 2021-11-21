@@ -11,7 +11,7 @@ CONFIG += c++11
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
-    opendialog.cpp
+    opendialog.cpp \
 
 HEADERS += \
     mainwindow.h \
