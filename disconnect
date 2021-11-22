@@ -1,0 +1,11 @@
+#ifndef DISCONNECT
+#define DISCONNECT
+
+
+class disconnect
+{
+public:
+    disconnect();
+};
+
+#endif // DISCONNECT

@@ -30,3 +30,23 @@ QString OpenDialog::GetLogin() {
 QString OpenDialog::GetPassword() {
     return ui->passwordEdit->text();
 }
+
+void OpenDialog::SetDbName(const QString& dbName) {
+    ui->dbNameEdit->insert(dbName);
+}
+
+void OpenDialog::SetHost(const QString& host) {
+    ui->hostEdit->insert(host);
+}
+
+void OpenDialog::SetPort(const QString& host) {
+    ui->portEdit->insert(host);
+}
+
+void OpenDialog::SetLogin(const QString& login) {
+      ui->loginEdit->insert(login);
+}
+
+void OpenDialog::SetPassword(const QString& pass) {
+     ui->passwordEdit->insert(pass);
+}
