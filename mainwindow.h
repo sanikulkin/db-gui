@@ -53,6 +53,8 @@ private:
     void PrintErrors(const QString& error);
     void SaveInfo(const ConnectInfo &info);
     void LoadInfo(ConnectInfo& info);
+    void SaveHistory();
+    void LoadHistory();
 };
 
 #endif // MAINWINDOW_H

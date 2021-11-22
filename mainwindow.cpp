@@ -36,6 +36,7 @@ void MainWindow::on_action_triggered() {
     QSqlDatabase db = ConnectToDb(info);
     setDb(db);
     PrintTables();
+    LoadHistory();
 }
 
 void MainWindow::setDb(const QSqlDatabase& p_db) {
@@ -124,6 +125,7 @@ void MainWindow::PrintHistory(const QString& query) {
         }
     }
     ui->historyEdit->appendPlainText(res);
+    SaveHistory();
 }
 
 void MainWindow::PrintErrors(const QString& error) {
@@ -145,3 +147,17 @@ void MainWindow::LoadInfo(ConnectInfo& info) {
     info.port = settings->value("port").toInt();
     info.userName = settings->value("userName").toString();
 }
+
+void MainWindow::SaveHistory() {
+    QString str = ui->historyEdit->toPlainText();
+    settings->setValue("history", str);
+}
+
+void MainWindow::LoadHistory() {
+    QString str = settings->value("history").toString();
+    ui->historyEdit->appendPlainText(str);
+}
+
+
+
+
