@@ -45,12 +45,14 @@ private slots:
 private:
     QSqlDatabase db;
     Ui::MainWindow *ui;
-    QSqlDatabase ConnectToDb(const ConnectInfo& info);
+    QSettings* settings;
+    QSqlDatabase ConnectToDb(ConnectInfo& info);
     void MakeQuery(const QString& query);
     void PrintTables();
     void PrintHistory(const QString& query);
     void PrintErrors(const QString& error);
     void SaveInfo(const ConnectInfo &info);
+    void LoadInfo(ConnectInfo& info);
 };
 
 #endif // MAINWINDOW_H

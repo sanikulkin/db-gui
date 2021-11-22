@@ -11,16 +11,22 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(ui->requestButton,SIGNAL(clicked()),this,SLOT(SendButton()));
     connect(ui->clearButton,SIGNAL(clicked()),this,SLOT(ClearButton()));
+
+    settings = new QSettings("../db-gui/malik_loh.ini", QSettings::IniFormat, this);
 }
 
 MainWindow::~MainWindow() {
     delete ui;
+    delete settings;
 }
 
 void MainWindow::on_action_triggered() {
     OpenDialog openDia;
     ConnectInfo info;
-    if (openDia.exec() == QDialog::Accepted) {
+    bool flag = true;
+    if (flag)
+        LoadInfo(info);
+    if (!flag && openDia.exec() == QDialog::Accepted) {
         info.host = openDia.GetHost();
         info.port = openDia.GetPort();
         info.dbName = openDia.GetDbName();
@@ -30,33 +36,35 @@ void MainWindow::on_action_triggered() {
     QSqlDatabase db = ConnectToDb(info);
     setDb(db);
     PrintTables();
-    SaveInfo(info);
 }
 
 void MainWindow::setDb(const QSqlDatabase& p_db) {
     db = p_db;
 }
 
-QSqlDatabase MainWindow::ConnectToDb(const ConnectInfo &info) {
+QSqlDatabase MainWindow::ConnectToDb(ConnectInfo &info) {
     QSqlDatabase db = QSqlDatabase::addDatabase("QPSQL", "myDb");
     if (info.host == "hui") {
-        db.setHostName("195.19.32.74");
-        db.setPort(5432);
-        db.setDatabaseName("fn1132_2021");
-        db.setUserName("student");
-        db.setPassword("bmstu");
-    } else {
-        db.setHostName(info.host);
-        db.setPort(info.port);
-        db.setDatabaseName(info.dbName);
-        db.setUserName(info.userName);
-        db.setPassword(info.password);
+        info.host = "195.19.32.74";
+        info.port = 5432;
+        info.dbName = "fn1132_2021";
+        info.userName = "student";
+        info.password = "bmstu";
     }
+    db.setHostName(info.host);
+    db.setPort(info.port);
+    db.setDatabaseName(info.dbName);
+    db.setUserName(info.userName);
+    db.setPassword(info.password);
 
     if (!db.open()) {
        PrintErrors("Database connection faild");
     }
+    else {
+        PrintErrors("Well done!");
+    }
 
+    SaveInfo(info);
     return db;
 }
 
@@ -67,7 +75,6 @@ void MainWindow::SendButton() {
     }
     QString query = GetQuery();
     MakeQuery(query);
-    PrintHistory(query);
 }
 
 void MainWindow::ClearButton() {
@@ -86,7 +93,8 @@ void MainWindow::MakeQuery(const QString& queryStr) {
         query->exec();
         setquery->setQuery(*query);
         ui->resultView->setModel(setquery);
-        ui->errorLable->setText("Well done");
+        PrintErrors("Well done");
+        PrintHistory(queryStr);
     } else if (queryStr.length() == 0) {
         PrintErrors("EmptyQuery");
     } else {
@@ -101,7 +109,21 @@ void MainWindow::PrintTables() {
 }
 
 void MainWindow::PrintHistory(const QString& query) {
-    ui->historyEdit->appendPlainText(query+"\n");
+    QString res;
+    bool flag = true;
+    for (int i = 0; i < query.size(); ++i) {
+        if (query[i] == '\t' || query[i] == '\n' || query[i] == ' ') {
+            if (flag) {
+                res.push_back(' ');
+                flag = false;
+            }
+        }
+        else {
+            res.push_back(query[i]);
+            flag = true;
+        }
+    }
+    ui->historyEdit->appendPlainText(res);
 }
 
 void MainWindow::PrintErrors(const QString& error) {
@@ -109,12 +131,17 @@ void MainWindow::PrintErrors(const QString& error) {
 }
 
 void MainWindow::SaveInfo(const ConnectInfo &info) {
-    QSettings settings;
-    settings.beginWriteArray("logins");
-    settings.setValue("dbName", info.dbName);
-    settings.setValue("host", info.host);
-    settings.setValue("password", info.password);
-    settings.setValue("port", info.port);
-    settings.setValue("userName", info.userName);
-    settings.endArray();
+    settings->setValue("dbName", info.dbName);
+    settings->setValue("host", info.host);
+    settings->setValue("password", info.password);
+    settings->setValue("port", info.port);
+    settings->setValue("userName", info.userName);
+}
+
+void MainWindow::LoadInfo(ConnectInfo& info) {
+    info.dbName = settings->value("dbName").toString();
+    info.host = settings->value("host").toString();
+    info.password = settings->value("password").toString();
+    info.port = settings->value("port").toInt();
+    info.userName = settings->value("userName").toString();
 }
