@@ -65,6 +65,17 @@ void MainWindow::SendButton() {
         PrintErrors("No connection to database");
         return;
     }
+    QSettings settings;
+    int size = settings.beginReadArray("connectInfo");
+    for (int i = 0; i < size; ++i) {
+        settings.setArrayIndex(i);
+        qDebug() << settings.value("dbName").toString();
+        qDebug() << settings.value("host").toString();
+        qDebug() << settings.value("password").toString();
+        qDebug() << settings.value("port").toString();
+        qDebug() << settings.value("userName").toString();
+    }
+    settings.endArray();
     QString query = GetQuery();
     MakeQuery(query);
     PrintHistory(query);
@@ -109,12 +120,13 @@ void MainWindow::PrintErrors(const QString& error) {
 }
 
 void MainWindow::SaveInfo(const ConnectInfo &info) {
-    QSettings settings;
-    settings.beginWriteArray("logins");
+    QSettings settings("./info.txt", QSettings::defaultFormat());
+    settings.beginWriteArray("connectInfo");
     settings.setValue("dbName", info.dbName);
     settings.setValue("host", info.host);
     settings.setValue("password", info.password);
     settings.setValue("port", info.port);
     settings.setValue("userName", info.userName);
     settings.endArray();
+    settings.sync();
 }
